@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calendario de Reservas | Luz y Tiempo</title>
+    <link rel="icon" href="imagenes/logo3.png" type="image/jpeg">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;700&family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Alex+Brush&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<div class="page-load-fade">
+
+    <header class="main-header">
+        <div class="logo">
+            <img src="imagenes/logo2.jpeg" alt="Logo" class="logo-img">
+            <span class="brand-name">LUZ Y TIEMPO PHOTOGRAPHY</span>
+            <span class="by-text">by</span> 
+            <span class="name-signature">Andrea Chávez</span>
+        </div>
+        <nav class="nav-container">
+            <ul class="nav-links">
+                <li><a href="prueba analytics.html">Inicio</a></li>
+                <li><a href="intento portafolio.html">Portafolio</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <div class="main-container">
+        <div class="background-image-cover" style="background-image: url('imagenes/98.jpg');"></div>
+        
+        <div class="calendar-column">
+            
+            <div id="calendar-view" class="fade-animated">
+                <div class="calendar-title-box">
+                    <h2>Reserva tu Sesión</h2>
+                    <p>Selecciona un día disponible en el calendario para elegir tu método de reserva.</p>
+                </div>
+                
+                <div class="calendar-wrapper">
+                    <div class="calendar-header">
+                        <button onclick="changeMonth(-1)" class="nav-btn">&#10094;</button>
+                        <h3 id="month-name">Mes Año</h3>
+                        <button onclick="changeMonth(1)" class="nav-btn">&#10095;</button>
+                    </div>
+                    <div class="calendar-grid" id="calendar-grid"></div>
+                </div>
+
+                <div class="booking-actions">
+                    <p id="selection-info"></p>
+                    <div class="buttons-row">
+                        <button id="book-btn" class="btn-submit btn-whatsapp" disabled onclick="sendWhatsAppBooking()">
+                            <i class="fab fa-whatsapp"></i> Reservar por WhatsApp
+                        </button>
+                        <button id="toggle-email-btn" class="btn-submit btn-email-toggle" disabled onclick="showFormView()">
+                            <i class="far fa-envelope"></i> Reservar por Correo
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="form-view" class="fade-animated" style="display: none; opacity: 0; transform: translateY(15px);">
+                <div class="calendar-title-box">
+                    <h2>Casi listo</h2>
+                    <p id="form-date-summary" style="color: #1b4d3e; font-weight: 700; letter-spacing: 0.5px;"></p>
+                    <p>Por favor, indícame tu nombre y un mensaje sobre tu sesión.</p>
+                </div>
+
+                <div class="form-container-box">
+                    <form id="email-booking-form" onsubmit="sendEmailBooking(event)">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Nombre</label>
+                                <input type="text" id="user-name" required placeholder="Tu nombre">
+                            </div>
+                            <div class="form-group">
+                                <label>Apellido</label>
+                                <input type="text" id="user-lastname" required placeholder="Tu apellido">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Mensaje o Detalles de la Sesión</label>
+                            <textarea id="user-message" rows="5" placeholder="Cuéntame qué tipo de sesión buscas..."></textarea>
+                        </div>
+                        
+                        <button type="submit" class="btn-submit btn-email-submit">
+                            AGENDAR SESIÓN 
+                        </button>
+                    </form>
+                    <button class="btn-back" onclick="hideFormView()"><i class="fas fa-arrow-left"></i> Volver al calendario</button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+</div>
+
+<style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Montserrat', Arial, sans-serif; background: #ffffff; color: #111; overflow-x: hidden; }
+
+    /* ESTILOS DE LA ANIMACIÓN FADE IN BREVE */
+    .page-load-fade {
+        animation: briefFadeIn 0.8s ease-out forwards;
+    }
+
+    @keyframes briefFadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    /* BARRA DE NAVEGACIÓN: BLANCO LISO AL 100% */
+    .main-header {
+        background: #ffffff; 
+        padding: 1.8rem 5%; 
+        display: flex; 
+        justify-content: space-between;
+        align-items: center; 
+        position: sticky; 
+        top: 0; 
+        z-index: 1000; 
+    }
+
+    /* Ajustes del logo para incluir nombre y firma en la misma línea */
+    .logo { 
+        display: flex; 
+        align-items: center; 
+        gap: 10px; 
+        flex-wrap: wrap;
+        color: #222;
+    }
+    
+    .logo-img { 
+        width: 60px; 
+        height: 60px; 
+        object-fit: contain; 
+        border-radius: 50%; 
+    }
+
+    .brand-name {
+        font-family: 'Playfair Display', Georgia, serif;
+        font-weight: bold;
+        font-size: 1.3rem; 
+        letter-spacing: 1px;
+        text-transform: uppercase;
+    }
+
+    .by-text {
+        font-family: 'Montserrat', sans-serif;
+        font-size: 0.8rem;
+        color: #888;
+        text-transform: lowercase;
+        font-weight: 400;
+    }
+
+    .name-signature {
+        font-family: 'Alex Brush', cursive;
+        font-size: 2rem;
+        color: #222;
+        font-weight: 400;
+        transform: translateY(3px);
+    }
+
+    .nav-links { display: flex; list-style: none; gap: 35px; }
+    .nav-links a { 
+        text-decoration: none; 
+        color: #272827; 
+        font-weight: 700; 
+        font-size: 1.15rem; 
+        transition: 0.3s; 
+    }
+    .nav-links a:hover { color: #2ecc71; }
+
+    /* CONTENEDOR PRINCIPAL */
+    .main-container { position: relative; min-height: calc(100vh - 105px); display: flex; align-items: flex-start; }
+
+    /* FONDO LATERAL DERECHO CON SU MÁSCARA */
+    .background-image-cover {
+        position: fixed; 
+        top: 105px; 
+        right: 0; 
+        width: 70%; 
+        height: calc(100vh - 105px); 
+        background-position: center right; 
+        background-size: cover; 
+        background-repeat: no-repeat;
+        z-index: 1;
+        -webkit-mask-image: linear-gradient(to left, rgba(0,0,0,1) 45%, rgba(0,0,0,0) 85%);
+        mask-image: linear-gradient(to left, rgba(0,0,0,1) 45%, rgba(0,0,0,0) 85%);
+    }
+
+    .calendar-column { position: relative; z-index: 10; width: 50%; padding: 50px 5% 50px 8%; }
+
+    .fade-animated { transition: opacity 0.35s ease, transform 0.35s ease; }
+
+    .calendar-title-box h2 { 
+        font-family: 'Playfair Display', Georgia, serif;
+        font-size: 2.4rem; 
+        font-weight: 700; 
+        letter-spacing: -0.5px; 
+        margin-bottom: 12px; 
+        color: #111; 
+    }
+    .calendar-title-box p { color: #444; max-width: 460px; line-height: 1.6; font-size: 0.95rem; margin-bottom: 25px; }
+
+    /* --- ESTILO DE CALENDARIO TOTALMENTE TRASLÚCIDO --- */
+    .calendar-wrapper { 
+        width: 100%; 
+        max-width: 440px; 
+        background: rgba(255, 255, 255, 0.45); 
+        backdrop-filter: blur(15px);
+        -webkit-backdrop-filter: blur(15px);
+        border: 1px solid rgba(255, 255, 255, 0.4);
+        border-radius: 12px; 
+        box-shadow: 0 15px 35px rgba(0,0,0,0.15);
+        overflow: hidden; 
+        margin-bottom: 25px; 
+        padding: 10px 5px;
+    }
+    
+    .calendar-header { 
+        background: transparent; 
+        color: #000; 
+        padding: 10px 15px; 
+        display: flex; 
+        justify-content: space-between; 
+        align-items: center; 
+        font-weight: bold;
+    }
+    .nav-btn { background: none; border: none; color: #000; cursor: pointer; font-size: 1.2rem; padding: 5px 10px; }
+    #month-name { font-size: 1.1rem; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: #000; }
+
+    .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); padding: 10px 15px; gap: 4px; text-align: center; }
+    .day-name { font-weight: 700; font-size: 0.85rem; color: #000; padding-bottom: 8px; text-transform: uppercase; }
+    
+    .calendar-day { 
+        aspect-ratio: 1; 
+        display: flex; 
+        align-items: center; 
+        justify-content: center; 
+        cursor: pointer; 
+        border-radius: 4px; 
+        transition: 0.2s; 
+        font-size: 0.9rem; 
+        font-weight: 600; 
+        color: #000; 
+    }
+    .calendar-day:hover:not(.empty) { background: rgba(0, 0, 0, 0.1); }
+    .calendar-day.selected { background: #18b65d !important; color: white !important; border-radius: 50%; box-shadow: none; }
+    .calendar-day.today { border: 1px dashed #000; }
+    .calendar-day.empty { cursor: default; }
+
+    .booking-actions { width: 100%; max-width: 440px; text-align: center; }
+    #selection-info { font-weight: 700; color: #1b4d3e; margin-bottom: 20px; min-height: 24px; font-size: 0.95rem; }
+
+    .buttons-row { display: flex; gap: 15px; width: 100%; max-width: 440px; }
+    .btn-submit { 
+        flex: 1; 
+        min-width: 160px;
+        color: white; 
+        border: none; 
+        padding: 16px 20px; 
+        cursor: pointer; 
+        border-radius: 30px; 
+        font-weight: bold; 
+        font-size: 0.9rem;
+        transition: all 0.3s ease; 
+        display: flex; 
+        align-items: center; 
+        justify-content: center; 
+        gap: 8px; 
+    }
+    .btn-whatsapp { background: #2ecc71; box-shadow: 0 4px 14px rgba(46,204,113,0.15); }
+    .btn-whatsapp:hover:not(:disabled) { background: #27ae60; transform: translateY(-1px); }
+    
+    .btn-email-toggle { background: #3498db; box-shadow: 0 4px 14px rgba(52,152,219,0.15); }
+    .btn-email-toggle:hover:not(:disabled) { background: #2980b9; transform: translateY(-1px); }
+    
+    .btn-submit:disabled { background: rgba(0,0,0,0.1); color: #888; cursor: not-allowed; box-shadow: none; transform: none; }
+
+    /* --- FORMULARIO TRASLÚCIDO EN LA SEGUNDA VISTA --- */
+    .form-container-box { 
+        width: 100%; 
+        max-width: 440px; 
+        background: rgba(255, 255, 255, 0.45); 
+        backdrop-filter: blur(15px);
+        -webkit-backdrop-filter: blur(15px);
+        border: 1px solid rgba(255, 255, 255, 0.4);
+        border-radius: 12px;
+        padding: 25px 20px; 
+        box-shadow: 0 15px 35px rgba(0,0,0,0.15); 
+    }
+    .form-row { display: flex; gap: 14px; }
+    .form-group { display: flex; flex-direction: column; gap: 4px; margin-bottom: 15px; flex: 1; text-align: left; }
+    .form-group label { font-size: 0.75rem; font-weight: 700; color: #000; text-transform: uppercase; }
+    
+    .form-group input, .form-group textarea { 
+        width: 100%;
+        padding: 10px 12px; 
+        border: 1px solid rgba(0, 0, 0, 0.2); 
+        background-color: rgba(255, 255, 255, 0.7); 
+        border-radius: 6px; 
+        font-family: inherit; 
+        font-size: 0.85rem; 
+        color: #000;
+        outline: none;
+        transition: all 0.2s ease; 
+    }
+    .form-group input:focus, .form-group textarea:focus { 
+        border-color: #000; 
+    }
+    .form-group textarea { resize: none; }
+    
+    .btn-email-submit { 
+        background: #111111; 
+        color: #fff;
+        width: 100%; 
+        margin-top: 5px; 
+        border-radius: 6px; 
+        font-size: 0.9rem;
+        padding: 12px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1); 
+    }
+    .btn-email-submit:hover { background: #2a2a2a; transform: translateY(-1px); }
+    
+    .btn-back { background: none; border: none; color: #444; cursor: pointer; margin-top: 15px; font-size: 0.8rem; font-weight: 600; transition: 0.2s; width: 100%; text-align: center; }
+    .btn-back:hover { color: #000; text-decoration: underline; }
+
+    @media (max-width: 868px) {
+        .background-image-cover { position: relative; top: 0; width: 100%; height: 200px; -webkit-mask-image: linear-gradient(to bottom, rgba(0,0,0,1) 70%, rgba(0,0,0,0) 100%); mask-image: linear-gradient(to bottom, rgba(0,0,0,1) 70%, rgba(0,0,0,0) 100%); }
+        .calendar-column { width: 100%; padding: 30px 5%; display: flex; flex-direction: column; align-items: center; }
+        .buttons-row { flex-direction: column; width: 100%; }
+        .btn-submit { width: 100%; }
+        
+        /* Ajuste de logo para móviles */
+        .logo { justify-content: center; text-align: center; }
+    }
+</style>
+
+<script>
+    let date = new Date();
+    let selectedDateText = ""; 
+    const months = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
+
+    function renderCalendar() {
+        const grid = document.getElementById('calendar-grid');
+        const monthName = document.getElementById('month-name');
+        grid.innerHTML = "";
+        const year = date.getFullYear();
+        const month = date.getMonth();
+        const firstDay = new Date(year, month, 1).getDay();
+        const lastDay = new Date(year, month + 1, 0).getDate();
+        monthName.innerText = `${months[month]} ${year}`;
+
+        ["Do", "Lu", "Ma", "Mi", "Ju", "Vi", "Sá"].forEach(d => grid.innerHTML += `<div class="day-name">${d}</div>`);
+        for (let i = 0; i < firstDay; i++) grid.innerHTML += `<div class="calendar-day empty"></div>`;
+
+        for (let i = 1; i <= lastDay; i++) {
+            const dayDiv = document.createElement('div');
+            dayDiv.classList.add('calendar-day');
+            dayDiv.innerText = i;
+            
+            const today = new Date();
+            if (i === today.getDate() && month === today.getMonth() && year === today.getFullYear()) {
+                dayDiv.classList.add('today');
+            }
+            
+            dayDiv.onclick = function() {
+                document.querySelectorAll('.calendar-day').forEach(d => d.classList.remove('selected'));
+                dayDiv.classList.add('selected');
+                selectedDateText = `${i} de ${months[month]} de ${year}`;
+                document.getElementById('selection-info').innerText = `Seleccionado: ${i} de ${months[month]}`;
+                document.getElementById('book-btn').disabled = false;
+                document.getElementById('toggle-email-btn').disabled = false;
+            };
+            grid.appendChild(dayDiv);
+        }
+    }
+
+    function changeMonth(delta) {
+        date.setMonth(date.getMonth() + delta);
+        renderCalendar();
+        document.getElementById('book-btn').disabled = true;
+        document.getElementById('toggle-email-btn').disabled = true;
+        document.getElementById('selection-info').innerText = "";
+    }
+
+    function showFormView() {
+        const calView = document.getElementById('calendar-view');
+        const formView = document.getElementById('form-view');
+        
+        calView.style.opacity = "0";
+        calView.style.transform = "translateY(-15px)";
+        
+        setTimeout(() => {
+            calView.style.display = 'none';
+            document.getElementById('form-date-summary').innerText = `Fecha elegida: ${selectedDateText}`;
+            
+            formView.style.display = 'block';
+            setTimeout(() => {
+                formView.style.opacity = "1";
+                formView.style.transform = "translateY(0)";
+            }, 30);
+        }, 350);
+    }
+
+    function hideFormView() {
+        const calView = document.getElementById('calendar-view');
+        const formView = document.getElementById('form-view');
+        
+        formView.style.opacity = "0";
+        formView.style.transform = "translateY(15px)";
+        
+        setTimeout(() => {
+            formView.style.display = 'none';
+            calView.style.display = 'block';
+            
+            setTimeout(() => {
+                calView.style.opacity = "1";
+                calView.style.transform = "translateY(0)";
+            }, 30);
+        }, 350);
+    }
+
+    function sendWhatsAppBooking() {
+        const phone = "523221396139"; 
+        const msg = `Hola Andrea! Me interesa agendar una sesión para el día: *${selectedDateText}*`;
+        window.open(`https://api.whatsapp.com/send?phone=${phone}&text=${encodeURIComponent(msg)}`, '_blank');
+    }
+
+    function sendEmailBooking(event) {
+        event.preventDefault();
+        const name = document.getElementById('user-name').value.trim();
+        const last = document.getElementById('user-lastname').value.trim();
+        const msg = document.getElementById('user-message').value.trim();
+        
+        const businessEmail = "achavez688@yahoo.com"; 
+        const subject = `Reserva de Sesión - ${name} ${last}`;
+        const body = `Nombre: ${name} ${last}\nFecha: ${selectedDateText}\n\nMensaje:\n"${msg || 'Sin comentarios.'}"`;
+
+        if (!/Android|iPhone|iPad|iPod/i.test(navigator.userAgent)) {
+            const gmailUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=${businessEmail}&su=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+            window.open(gmailUrl, '_blank');
+        } else {
+            window.location.href = `mailto:${businessEmail}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+        }
+    }
+
+    renderCalendar();
+</script>
+</body>
+</html>

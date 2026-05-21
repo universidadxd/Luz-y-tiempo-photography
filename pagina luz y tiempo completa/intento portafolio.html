@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portafolio de Fotografía | Andrea Chavez</title>
+    <link rel="icon" href="imagenes/logo3.png" type="image/jpeg">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;700&family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Alex+Brush&display=swap" rel="stylesheet">
+
+    <style>
+        /* --- 1. ESTILOS BASE Y NAVEGACIÓN INTELIGENTE --- */
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { 
+            font-family: 'Montserrat', Helvetica, Arial, sans-serif; 
+            background-color: #ffffff; 
+            color: #333; 
+            line-height: 1.6; 
+        }
+
+        /* ANIMACIÓN FADE IN SÓLO PARA LA CARGA INICIAL DE LA PÁGINA (Ajustado a 2s) */
+        .page-fade-in {
+            animation: customFadeIn 2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        @keyframes customFadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(8px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .main-header {
+            background: #ffffff;
+            padding: 1.5rem 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.06);
+            
+            /* Animación de transición fluida */
+            transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            will-change: transform;
+        }
+
+        /* Clase que inyectará JavaScript cuando desciendas */
+        .main-header.scroll-down {
+            transform: translateY(-100%); /* Desplaza la barra hacia arriba fuera de la pantalla */
+        }
+
+        /* Ajustes del logo para incluir nombre y firma en la misma línea */
+        .logo { 
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+            color: #222;
+        }
+        
+        .logo img {
+            width: 55px; 
+            height: 55px;
+            object-fit: contain;
+            border-radius: 50%;
+        }
+
+        .brand-name {
+            font-family: 'Playfair Display', Georgia, serif;
+            font-weight: bold;
+            font-size: 1.3rem; 
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .by-text {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.8rem;
+            color: #888;
+            text-transform: lowercase;
+            font-weight: 400;
+        }
+
+        .name-signature {
+            font-family: 'Alex Brush', cursive;
+            font-size: 2rem;
+            color: #222;
+            font-weight: 400;
+            transform: translateY(3px);
+        }
+
+        .nav-links { 
+            display: flex; 
+            list-style: none; 
+            gap: 40px; 
+            align-items: center; 
+        }
+        
+        .nav-links a { 
+            text-decoration: none; 
+            color: #444; 
+            font-weight: 700; 
+            font-size: 1.05rem; 
+            transition: 0.3s; 
+        }
+        .nav-links a:hover { color: #2ecc71; }
+
+        /* Estilos de iconos sociales en barra de navegación */
+        .nav-social-icon {
+            font-size: 1.2rem;
+            color: #444;
+            transition: 0.3s ease;
+            display: flex;
+            align-items: center;
+            background: none;
+            border: none;
+            cursor: pointer;
+        }
+        .nav-social-icon.instagram:hover { color: #e1306c; transform: scale(1.1); }
+        .nav-social-icon.facebook:hover { color: #1877f2; transform: scale(1.1); }
+        .nav-social-icon.share:hover { color: #0076ff; transform: scale(1.1); }
+
+        /* Color corregido igual al de la página principal */
+        .btn-agenda {
+            background: #2ecc71;
+            color: white !important;
+            padding: 10px 22px; 
+            border-radius: 25px;
+            font-size: 0.85rem;
+            font-weight: bold;
+            box-shadow: 0 4px 10px rgba(46, 204, 113, 0.3);
+        }
+
+        /* --- 2. ASIMÉTRICA --- */
+        .gallery-container { 
+            padding: 40px 20px 20px 20px; 
+            max-width: 1600px; 
+            margin: 0 auto; 
+        }
+        
+        .gallery-grid { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); 
+            grid-auto-rows: 200px; 
+            grid-auto-flow: dense; 
+            gap: 20px; 
+        }
+
+        .gallery-item { 
+            position: relative; 
+            overflow: hidden; 
+            border-radius: 8px; 
+            cursor: pointer; 
+            box-shadow: 0 4px 10px rgba(0,0,0,0.02);
+            background-color: #f5f5f5; 
+        }
+        
+        .gallery-item img { 
+            width: 100%; 
+            height: 100%; 
+            object-fit: cover; 
+            display: block; 
+            opacity: 0;
+            transition: opacity 0.2s ease;
+        }
+
+        .gallery-item img.loaded { opacity: 1; }
+        .gallery-item:hover img.loaded { transform: scale(1.06); filter: brightness(90%); transition: transform 0.5s ease, filter 0.5s ease; }
+
+        .size-normal { grid-row: span 2; }
+        .size-tall { grid-row: span 3; }
+        .size-wide { grid-column: span 2; grid-row: span 2; }
+
+        @media (max-width: 768px) {
+            .main-header { padding: 1.2rem 5%; flex-direction: column; gap: 15px; }
+            .nav-links { gap: 20px; }
+            .logo { justify-content: center; text-align: center; }
+        }
+
+        @media (max-width: 600px) {
+            .gallery-grid { grid-template-columns: 1fr; grid-auto-rows: auto; }
+            .size-normal, .size-tall, .size-wide { grid-row: auto !important; grid-column: auto !important; }
+            .gallery-item img { aspect-ratio: 4 / 3; }
+        }
+
+        /* --- 3. LIGHTBOX FIJO PREVENIDOR DE MOVIMIENTOS --- */
+        .lightbox {
+            display: none; 
+            position: fixed; 
+            z-index: 9999; 
+            top: 0; 
+            left: 0; 
+            width: 100vw; 
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.96);
+            flex-direction: column;
+            justify-content: space-between;
+            overflow: hidden; 
+        }
+
+        .lightbox-main {
+            position: relative;
+            flex-grow: 1;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .lightbox-slider {
+            display: flex;
+            width: 100%;
+            height: 100%;
+            transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+            will-change: transform;
+        }
+
+        .lightbox-slide {
+            min-width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            user-select: none;
+        }
+
+        .lightbox-slide img {
+            max-width: 85%; max-height: 75vh;
+            border-radius: 4px; box-shadow: 0 0 30px rgba(0,0,0,0.5);
+            object-fit: contain;
+            transition: max-width 0.3s ease, max-height 0.3s ease;
+        }
+
+        .lightbox-controls {
+            position: absolute; top: 25px; right: 30px;
+            display: flex; align-items: center; gap: 30px; z-index: 2020;
+        }
+
+        .fullscreen-lightbox, .close-lightbox {
+            color: white; cursor: pointer; user-select: none; transition: 0.2s;
+        }
+        .fullscreen-lightbox { font-size: 26px; display: flex; align-items: center; justify-content: center; }
+        .close-lightbox { font-size: 50px; line-height: 40px; }
+        .fullscreen-lightbox:hover, .close-lightbox:hover { color: #2ecc71; transform: scale(1.1); }
+
+        .nav-arrow {
+            position: absolute; top: 50%; transform: translateY(-50%);
+            color: white; font-size: 60px; cursor: pointer;
+            padding: 20px; user-select: none; transition: 0.2s; z-index: 2020;
+        }
+        .nav-arrow:hover { color: #2ecc71; }
+        .prev-arrow { left: 20px; }
+        .next-arrow { right: 20px; }
+
+        .lightbox-carousel {
+            width: 100%;
+            background: rgba(10, 10, 10, 0.8);
+            padding: 15px 0;
+            display: flex;
+            justify-content: flex-start;
+            gap: 10px;
+            overflow-x: auto;
+            white-space: nowrap;
+            z-index: 2010;
+            scrollbar-width: thin;
+            scrollbar-color: #2ecc71 #222;
+            padding-left: 20px;
+            padding-right: 20px;
+        }
+
+        .lightbox-carousel::-webkit-scrollbar { height: 5px; }
+        .lightbox-carousel::-webkit-scrollbar-thumb { background-color: #2ecc71; border-radius: 10px; }
+
+        .carousel-thumb {
+            width: 60px;
+            height: 45px;
+            object-fit: cover;
+            border-radius: 4px;
+            cursor: pointer;
+            opacity: 0.4;
+            transition: opacity 0.3s ease, transform 0.3s ease, border 0.3s ease;
+            border: 2px solid transparent;
+            display: inline-block;
+            flex-shrink: 0;
+        }
+
+        .carousel-thumb:hover { opacity: 0.8; transform: scale(1.05); }
+        .carousel-thumb.active { opacity: 1; border-color: #2ecc71; transform: scale(1.1); }
+
+        #scroll-sentinel { height: 20px; width: 100%; margin-top: 20px; }
+
+        /* Pantalla Completa */
+        .lightbox:fullscreen .lightbox-carousel {
+            display: none !important;
+        }
+
+        .lightbox:fullscreen .lightbox-slide img {
+            max-width: 100vw;  
+            max-height: 100vh; 
+            border-radius: 0;  
+            box-shadow: none;  
+        }
+
+        @media (max-width: 768px) {
+            .nav-arrow { font-size: 40px; }
+            .lightbox-slide img { max-width: 95%; max-height: 65vh; }
+            .lightbox-controls { right: 20px; top: 20px; gap: 20px; }
+            .carousel-thumb { width: 50px; height: 38px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="page-fade-in">
+
+    <header class="main-header" id="header-nav">
+        <div class="logo">
+            <img src="imagenes/logo2.jpeg" alt="Logo Luz y Tiempo">
+            <span class="brand-name">LUZ Y TIEMPO PHOTOGRAPHY</span>
+            <span class="by-text">by</span> 
+            <span class="name-signature">Andrea Chávez</span>
+        </div>
+        <nav class="nav-container">
+            <ul class="nav-links">
+                <li><a href="prueba analytics.html">Inicio</a></li>
+                <li><a href="https://www.instagram.com/luzytiempo_weddings?igsh=MmVobXB1bXp5MTEz" target="_blank" class="nav-social-icon instagram" title="Instagram"><i class="fab fa-instagram"></i></a></li>
+                <li><a href="https://www.facebook.com/LuzyTiempo/" target="_blank" class="nav-social-icon facebook" title="Facebook"><i class="fab fa-facebook-f"></i></a></li>
+                <li><button onclick="sharePortfolio()" class="nav-social-icon share" title="Compartir Portafolio"><i class="fas fa-share"></i></button></li>
+                <li><a href="calendario2.html" class="btn-agenda">Agendar Sesión</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main class="gallery-container">
+        <div class="gallery-grid" id="main-gallery">
+            <div class="gallery-item size-wide" data-index="0"><img src="imagenes/f1.jpg" alt="Boda" class="loaded"></div>
+            <div class="gallery-item size-tall" data-index="1"><img src="imagenes/f10.jpg" alt="Retrato" class="loaded"></div>
+            <div class="gallery-item size-normal" data-index="2"><img src="imagenes/f11.jpg" alt="Paisaje" class="loaded"></div>
+            <div class="gallery-item size-wide" data-index="3"><img src="imagenes/f12.jpg" alt="Pareja" class="loaded"></div>
+            <div class="gallery-item size-normal" data-index="4"><img src="imagenes/f3.jpg" alt="Detalle" class="loaded"></div>
+            <div class="gallery-item size-tall" data-index="5"><img src="imagenes/f4.jpg" alt="Urbana" class="loaded"></div>
+            <div class="gallery-item size-normal" data-index="6"><img src="imagenes/f5.jpg" alt="Noche" class="loaded"></div>
+        </div>
+        <div id="scroll-sentinel"></div>
+    </main>
+
+    <div id="lightbox" class="lightbox">
+        <div class="lightbox-main">
+            <div class="lightbox-controls">
+                <i class="fa-solid fa-expand fullscreen-lightbox" id="fullscreenBtn" title="Pantalla Completa"></i>
+                <span class="close-lightbox" id="closeBtn" title="Cerrar">&times;</span>
+            </div>
+            
+            <span class="nav-arrow prev-arrow" id="prevBtn">&#10094;</span>
+            <div class="lightbox-slider" id="lightbox-slider"></div>
+            <span class="nav-arrow next-arrow" id="nextBtn">&#10095;</span>
+        </div>
+        <div class="lightbox-carousel" id="lightbox-carousel"></div>
+    </div>
+
+    <footer style="text-align: center; padding: 40px; color: #aaa; font-size: 0.9rem;">
+        &copy; 2026 Luz y Tiempo Photography. Todos los derechos reservados.
+    </footer>
+
+</div>
+
+    <script>
+        const galleryGrid = document.getElementById('main-gallery');
+        const lightbox = document.getElementById('lightbox');
+        const lightboxSlider = document.getElementById('lightbox-slider');
+        const lightboxCarousel = document.getElementById('lightbox-carousel');
+        const closeBtn = document.getElementById('closeBtn');
+        const fullscreenBtn = document.getElementById('fullscreenBtn');
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        const sentinel = document.getElementById('scroll-sentinel');
+        const headerNav = document.getElementById('header-nav');
+        
+        let currentIndex = 0;
+        let isTransitioning = false; 
+
+        // --- ANIMACIÓN DETECTORA DE SCROLL PARA EL HEADER ---
+        let lastScrollY = window.scrollY;
+
+        window.addEventListener('scroll', () => {
+            const currentScrollY = window.scrollY;
+
+            if (currentScrollY > lastScrollY && currentScrollY > 100) {
+                headerNav.classList.add('scroll-down');
+            } else {
+                headerNav.classList.remove('scroll-down');
+            }
+            lastScrollY = currentScrollY;
+        });
+
+
+        // --- ARREGLO MAESTRO GLOBAL ---
+        const allImagesUrls = [
+            { src: 'imagenes/f1.jpg', alt: 'Boda' },
+            { src: 'imagenes/f10.jpg', alt: 'Retrato' },
+            { src: 'imagenes/f11.jpg', alt: 'Paisaje' },
+            { src: 'imagenes/f12.jpg', alt: 'Pareja' },
+            { src: 'imagenes/f3.jpg', alt: 'Detalle' },
+            { src: 'imagenes/f4.jpg', alt: 'Urbana' },
+            { src: 'imagenes/f5.jpg', alt: 'Noche' }
+        ];
+
+        for (let i = 30; i <= 96; i++) {
+            if (i === 90) continue;
+            allImagesUrls.push({ src: `imagenes/${i}.jpg`, alt: `Fotografía ${i}` });
+        }
+
+        galleryGrid.querySelectorAll('.gallery-item').forEach((item) => {
+            const idx = parseInt(item.getAttribute('data-index'));
+            item.onclick = (e) => {
+                e.preventDefault();
+                openLightbox(idx);
+            };
+        });
+
+        // 1. CARGA INFINITA EN EL MOSAICO
+        let nextImageToLoad = 30;
+        const maxImageNumber = 96;
+        const batchSize = 12; 
+        const sizes = ['size-normal', 'size-tall', 'size-wide', 'size-normal', 'size-tall'];
+        let deployedGridCount = 7; 
+
+        function loadMoreImages() {
+            if (nextImageToLoad > maxImageNumber) {
+                observer.unobserve(sentinel);
+                return;
+            }
+
+            const fragment = document.createDocumentFragment();
+            const end = Math.min(nextImageToLoad + batchSize - 1, maxImageNumber);
+
+            for (let i = nextImageToLoad; i <= end; i++) {
+                if (i === 90) continue; 
+
+                const item = document.createElement('div');
+                
+                let sizeClass;
+                if (i === 32) {
+                    sizeClass = 'size-tall'; 
+                } else if (i === 31 || i === 37 || i === 39 || i === 74 || i === 84 || i === 49 || i === 36) {
+                    sizeClass = 'size-wide'; 
+                } else {
+                    sizeClass = sizes[i % sizes.length]; 
+                }
+                
+                item.className = `gallery-item ${sizeClass}`;
+                
+                const currentGridIndex = deployedGridCount;
+                item.onclick = (e) => {
+                    e.preventDefault();
+                    openLightbox(currentGridIndex);
+                };
+                deployedGridCount++;
+
+                const img = document.createElement('img');
+                img.alt = `Fotografía ${i}`;
+                img.loading = "lazy";
+                img.src = `imagenes/${i}.jpg`;
+                
+                img.onload = function() { 
+                    this.classList.add('loaded'); 
+                };
+                
+                item.appendChild(img);
+                fragment.appendChild(item);
+            }
+
+            galleryGrid.appendChild(fragment);
+            nextImageToLoad = end + 1;
+        }
+
+        const observer = new IntersectionObserver((entries) => {
+            if (entries[0].isIntersecting) {
+                loadMoreImages();
+            }
+        }, { rootMargin: '400px' });
+
+        observer.observe(sentinel);
+
+        // 2. SISTEMA DEL LIGHTBOX Y CARRETE
+        function openLightbox(index) {
+            currentIndex = index;
+            lightbox.style.display = 'flex';
+            
+            document.body.style.position = 'fixed';
+            document.body.style.top = `-${window.scrollY}px`;
+            document.body.style.width = '100%';
+            
+            renderCarousel();
+            setupSliderStructure();
+        }
+
+        function renderCarousel() {
+            lightboxCarousel.innerHTML = '';
+            allImagesUrls.forEach((imgData, idx) => {
+                const thumb = document.createElement('img');
+                thumb.src = imgData.src;
+                thumb.alt = `Miniatura ${idx}`;
+                thumb.className = `carousel-thumb ${idx === currentIndex ? 'active' : ''}`;
+                
+                thumb.onclick = (e) => {
+                    e.stopPropagation();
+                    if (idx === currentIndex || isTransitioning) return;
+                    currentIndex = idx;
+                    setupSliderStructure();
+                };
+                lightboxCarousel.appendChild(thumb);
+            });
+
+            moveCarouselToActive();
+        }
+
+        function moveCarouselToActive() {
+            const activeThumb = lightboxCarousel.children[currentIndex];
+            if (activeThumb) {
+                activeThumb.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+            }
+        }
+
+        function setupSliderStructure() {
+            const total = allImagesUrls.length;
+            const prevIndex = (currentIndex - 1 + total) % total;
+            const nextIndex = (currentIndex + 1) % total;
+
+            const prevImg = allImagesUrls[prevIndex];
+            const currentImg = allImagesUrls[currentIndex];
+            const nextImg = allImagesUrls[nextIndex];
+
+            lightboxSlider.style.transition = 'none';
+            lightboxSlider.style.transform = 'translateX(-100%)';
+
+            lightboxSlider.innerHTML = `
+                <div class="lightbox-slide"><img src="${prevImg.src}" alt="${prevImg.alt}"></div>
+                <div class="lightbox-slide"><img src="${currentImg.src}" alt="${currentImg.alt}"></div>
+                <div class="lightbox-slide"><img src="${nextImg.src}" alt="${nextImg.alt}"></div>
+            `;
+
+            lightboxSlider.offsetHeight; 
+            lightboxSlider.style.transition = 'transform 0.6s cubic-bezier(0.16, 1, 0.3, 1)';
+            isTransitioning = false;
+
+            Array.from(lightboxCarousel.children).forEach((thumb, idx) => {
+                if (idx === currentIndex) {
+                    thumb.classList.add('active');
+                } else {
+                    thumb.classList.remove('active');
+                }
+            });
+            moveCarouselToActive();
+        }
+
+        function changeSlide(direction) {
+            if (isTransitioning) return;
+            isTransitioning = true;
+
+            const total = allImagesUrls.length;
+
+            if (direction === 'next') {
+                currentIndex = (currentIndex + 1) % total;
+                lightboxSlider.style.transform = 'translateX(-200%)';
+            } else if (direction === 'prev') {
+                currentIndex = (currentIndex - 1 + total) % total;
+                lightboxSlider.style.transform = 'translateX(0%)';
+            }
+
+            setTimeout(() => {
+                setupSliderStructure();
+            }, 600); 
+        }
+
+        nextBtn.onclick = (e) => { e.stopPropagation(); changeSlide('next'); };
+        prevBtn.onclick = (e) => { e.stopPropagation(); changeSlide('prev'); };
+
+        // 3. PANTALLA COMPLETA Y FUNCIONES DE CIERRE RE-AJUSTADAS
+        function toggleFullscreen() {
+            if (!document.fullscreenElement) {
+                lightbox.requestFullscreen().catch(err => console.error(err));
+                fullscreenBtn.className = "fa-solid fa-compress fullscreen-lightbox";
+            } else {
+                document.exitFullscreen();
+                fullscreenBtn.className = "fa-solid fa-expand fullscreen-lightbox";
+            }
+        }
+
+        fullscreenBtn.onclick = (e) => { e.stopPropagation(); toggleFullscreen(); };
+        document.addEventListener('fullscreenchange', () => {
+            if (!document.fullscreenElement) fullscreenBtn.className = "fa-solid fa-expand fullscreen-lightbox";
+        });
+
+        function closeLightbox() {
+            if (document.fullscreenElement) document.exitFullscreen();
+            lightbox.style.display = 'none';
+            
+            const scrollY = document.body.style.top;
+            document.body.style.position = '';
+            document.body.style.top = '';
+            document.body.style.width = '';
+            window.scrollTo(0, parseInt(scrollY || '0') * -1);
+            
+            lightboxSlider.innerHTML = ''; 
+            lightboxCarousel.innerHTML = '';
+        }
+        
+        closeBtn.onclick = closeLightbox;
+        lightbox.onclick = (e) => { 
+            if (e.target === lightbox || e.target.classList.contains('lightbox-main') || e.target.classList.contains('lightbox-slide')) {
+                closeLightbox(); 
+            }
+        };
+
+        document.addEventListener('keydown', (e) => {
+            if (lightbox.style.display === 'flex') {
+                if (e.key === "ArrowRight") changeSlide('next');
+                if (e.key === "ArrowLeft") changeSlide('prev');
+                if (e.key === "Escape") closeLightbox();
+                if (e.key === "f" || e.key === "F") toggleFullscreen();
+            }
+        });
+
+        // --- FUNCIÓN DE COMPARTIR PORTAFOLIO ---
+        function sharePortfolio() {
+            if (navigator.share) {
+                navigator.share({
+                    title: 'Luz y tiempo photography',
+                    text: '¡Mira el portafolio profesional de fotografía de Andrea Chavez!',
+                    url: window.location.href
+                })
+                .then(() => console.log('Compartido con éxito'))
+                .catch((error) => console.log('Error al compartir:', error));
+            } else {
+                navigator.clipboard.writeText(window.location.href);
+                alert('El enlace del portafolio se ha copiado al portapapeles.');
+            }
+        }
+    </script>
+</body>
+</html>
